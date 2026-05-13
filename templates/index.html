@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SpendSync</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    color: white;
+    background: radial-gradient(circle at top left, #0f766e, #020617);
+}
+
+/* NAVBAR */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px 60px;
+    align-items: center;
+}
+
+.logo {
+    font-weight: bold;
+    font-size: 20px;
+}
+
+/* HERO */
+.hero {
+    text-align: center;
+    margin-top: 60px;
+}
+
+.hero h1 {
+    font-size: 60px;
+}
+
+.highlight {
+    color: #22d3ee;
+}
+
+.highlight-green {
+    color: #4ade80;
+}
+
+.subtext {
+    color: #94a3b8;
+    max-width: 600px;
+    margin: 20px auto;
+}
+
+/* INPUT CARD */
+.card {
+    margin: 40px auto;
+    width: 380px;
+    padding: 30px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 15px;
+    backdrop-filter: blur(10px);
+    text-align: center;
+}
+
+.card h2 {
+    margin-bottom: 20px;
+}
+
+input, select {
+    width: 100%;
+    padding: 12px;
+    margin: 8px 0;
+    border-radius: 8px;
+    border: none;
+    outline: none;
+}
+
+button {
+    width: 100%;
+    padding: 12px;
+    background: #22d3ee;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* RESULT COLORS */
+#result {
+    margin-top: 20px;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.approved {
+    color: #4ade80;
+}
+
+.rejected {
+    color: #f87171;
+}
+</style>
+</head>
+
+<body>
+
+<div class="navbar">
+    <div class="logo">💸 SpendSync</div>
+</div>
+
+<div class="hero">
+    <h1>
+        Smart <span class="highlight">expense</span> approval<br>
+        powered by <span class="highlight-green">AI</span>
+    </h1>
+
+    <p class="subtext">
+        Predict reimbursement approval instantly using machine learning.
+    </p>
+</div>
+
+<!-- INPUT UI -->
+<div class="card">
+    <h2>Try Prediction</h2>
+
+    <input id="amount" type="number" placeholder="Expense Amount">
+    <input id="days" type="number" placeholder="Days After Expense">
+    <input id="prevClaims" type="number" placeholder="Previous Claims">
+    <input id="freq" type="number" placeholder="Claim Frequency">
+
+    <select id="receipt">
+        <option value="1">Receipt Attached</option>
+        <option value="0">No Receipt</option>
+    </select>
+
+    <button onclick="predict()">Predict</button>
+
+    <div id="result"></div>
+</div>
+
+<!-- JAVASCRIPT -->
+<script>
+function predict() {
+    const resultDiv = document.getElementById('result');
+
+    // Show loading state
+    resultDiv.innerText = "Analyzing...";
+    resultDiv.className = "";
+
+    const amount = document.getElementById('amount').value;
+    const days = document.getElementById('days').value;
+    const prevClaims = document.getElementById('prevClaims').value;
+    const freq = document.getElementById('freq').value;
+    const receipt = document.getElementById('receipt').value;
+
+    fetch('/predict', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            ExpenseAmount: parseFloat(amount),
+            DaysAfterExpense: parseFloat(days),
+            PreviousClaims: parseFloat(prevClaims),
+            ClaimFrequency: parseFloat(freq),
+            ReceiptAttached: parseInt(receipt)
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        resultDiv.innerText = "Prediction: " + data.result;
+
+        // Color feedback
+        if (data.result === "APPROVED") {
+            resultDiv.classList.add("approved");
+        } else {
+            resultDiv.classList.add("rejected");
+        }
+    })
+    .catch(err => {
+        resultDiv.innerText = "Error connecting to server";
+        resultDiv.classList.add("rejected");
+    });
+}
+</script>
+
+</body>
+</html>
