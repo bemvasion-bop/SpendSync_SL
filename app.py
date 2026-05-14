@@ -26,9 +26,9 @@ def predict():
 
     # Inputs from frontend
     amount = float(data['ExpenseAmount'])
-    days = float(data['DaysAfterExpense'])
-    prev_claims = float(data['PreviousClaims'])
-    freq = float(data['ClaimFrequency'])
+    days = int(data['DaysAfterExpense'])
+    prev_claims = int(data['PreviousClaims'])
+    freq = int(data['ClaimFrequency'])
     receipt = int(data['ReceiptAttached'])
 
     # Feature engineering
